@@ -6,6 +6,7 @@ import {
   InfoWindow
 } from "@react-google-maps/api";
 import { formatRelative } from "date-fns";
+import { es } from "date-fns/esm/locale";
 import mapStyles from "./mapStyles";
 const libraries = ["places"];
 
@@ -31,6 +32,8 @@ function App() {
   });
 
   const [markers, setMarkers] = useState([]);
+  const [selected, setSelected] = useState(null);
+
   const onMapClick = useCallback((event) => {
     setMarkers(current => [...current, {
       lat: event.latLng.lat(),
@@ -67,8 +70,17 @@ function App() {
                 scaledSize: new window.google.maps.Size(50,50),
                 origin: new window.google.maps.Point(0,0),
                 anchor: new window.google.maps.Point(25,25),
+              }}
+              onClick={() => {
+                setSelected(marker);
               }} />)
           )}
+          {selected ? (<InfoWindow position={{ lat: selected.lat, lng: selected.lng }}>
+            <div>
+              <h2>Puma encontrado!</h2>
+              <p>Encontrado a las {formatRelative(selected.time, new Date(), {locale: es})}</p>
+            </div>
+          </InfoWindow>) : null}
       </GoogleMap>
     </div>
   );
