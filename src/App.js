@@ -71,6 +71,7 @@ function App() {
   return (
     <div>
       <Search panTo={panTo} />
+      <Locate panTo={panTo} />
       <h1>Pumas {" "}
         <span role="img" aria-label="campamento">🏕</span><span role="img" aria-label="puma">🐈</span>
       </h1>
@@ -103,6 +104,21 @@ function App() {
           </InfoWindow>) : null}
       </GoogleMap>
     </div>
+  );
+}
+
+function Locate({panTo}) {
+  return (
+    <button className="locate" onClick={() => {
+      navigator.geolocation.getCurrentPosition((position) => {
+        panTo({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+       },error => console.error);
+    }}>
+      <img src="compass.svg" alt="compass - locate me"/>
+    </button>
   );
 }
 
