@@ -23,22 +23,21 @@ import mapStyles from "./mapStyles";
 
 
 const libraries = ["places"];
+const mapContainerStyle = {
+  width: '100vw',
+  height: '100vh',
+};
+const center = {
+  lat: -36.140890,
+  lng: -71.826810,
+}
+const options = {
+  styles: mapStyles,
+  disableDefaultUI: true,
+  zoomControl: true,
+};
 
 function App() {
-
-  const mapContainerStyle = {
-    width: '100vw',
-    height: '100vh',
-  };
-  const center = {
-    lat: -36.140890,
-    lng: -71.826810,
-  }
-  const options = {
-    styles: mapStyles,
-    disableDefaultUI: true,
-    zoomControl: true,
-  };
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
