@@ -75,7 +75,7 @@ function App() {
                 setSelected(marker);
               }} />)
           )}
-          {selected ? (<InfoWindow position={{ lat: selected.lat, lng: selected.lng }}>
+          {selected ? (<InfoWindow position={{ lat: selected.lat, lng: selected.lng }} onCloseClick={() => setSelected(null)}>
             <div>
               <h2>Puma encontrado!</h2>
               <p>Encontrado a las {formatRelative(selected.time, new Date(), {locale: es})}</p>
