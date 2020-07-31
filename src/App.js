@@ -5,9 +5,23 @@ import {
   Marker,
   InfoWindow
 } from "@react-google-maps/api";
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+} from "@reach/combobox";
+import "@reach/combobox/styles.css"
 import { formatRelative } from "date-fns";
 import { es } from "date-fns/esm/locale";
 import mapStyles from "./mapStyles";
+
+
 const libraries = ["places"];
 
 function App() {
@@ -44,13 +58,19 @@ function App() {
   const mapRef = useRef();
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
-  }, [])
+  }, []);
+
+  const panTo = useCallback(({lat, lng}) => {
+    mapRef.current.panTo({lat, lng});
+    mapRef.current.setZoom(14);
+  },[]);
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading maps...";
 
   return (
     <div>
+      <Search panTo={panTo} />
       <h1>Pumas {" "}
         <span role="img" aria-label="campamento">🏕</span><span role="img" aria-label="puma">🐈</span>
       </h1>
@@ -82,6 +102,51 @@ function App() {
             </div>
           </InfoWindow>) : null}
       </GoogleMap>
+    </div>
+  );
+}
+
+function Search({panTo}) {
+  const {
+    ready,
+    value,
+    suggestions: { status, data },
+    setValue,
+    clearSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      location: { lat: () => -36.140890, lng: () => -71.826810 },
+      radius: 200 * 1000
+    }
+  })
+
+  return (
+    <div className="search">
+      <Combobox onSelect={ async (address) => {
+        setValue(address, false);
+        clearSuggestions();
+        try {
+          const results = await getGeocode({address});
+          const { lat, lng } = await getLatLng(results[0]);
+          panTo({lat, lng});
+        } catch (error) {
+          console.log("Error: ", error);
+        }
+      }}>
+      <ComboboxInput value={value} onChange={(e) => {
+        setValue(e.target.value);
+      }}
+      disabled={!ready}
+      placeholder="Ingresa una dirección" />
+        <ComboboxPopover>
+          <ComboboxList>
+            {status === "OK" &&
+              data.map(({ id, description }) => (
+                <ComboboxOption key={id} value={description} />
+              ))}
+          </ComboboxList>
+        </ComboboxPopover>
+      </Combobox>
     </div>
   );
 }
